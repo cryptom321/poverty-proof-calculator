@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Poverty Proof Compound Calculator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&display=swap">
+<style>
+:root{
+--ink:#070806; --page:#0e100c; --panel:#161913; --panel2:#1d2118; --line:#2c3125; --fg:#eef1e8; --muted:#9aa38c;
+--green:#4A9A24; --lime:#8FD16A; --gold:#d9c46a; --red:#e2725b;
+--display:"Archivo Black","Arial Black",Impact,sans-serif;
+--body:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--page);color:var(--fg);font-family:var(--body);font-size:14.5px;line-height:1.45}
+.wrap{max-width:1160px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{background:#000;border-bottom:3px solid var(--green)}
+header .wrap{display:flex;align-items:center;gap:12px;padding-block:16px}
+.mark{width:40px;height:40px;border:3px solid var(--green);display:grid;place-items:center;font-family:var(--display);color:var(--lime);font-size:19px;transform:rotate(45deg);flex:none}
+.mark span{transform:rotate(-45deg)}
+.word{font-family:var(--display);font-size:22px;letter-spacing:.04em;line-height:1}
+.word b{color:var(--lime);font-weight:400}
+.tagline{color:var(--muted);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(24px,4vw,36px);margin:24px 0 4px;text-wrap:balance}
+h1 em{font-style:normal;color:var(--lime)}
+.lede{color:var(--muted);margin:0 0 20px;max-width:70ch}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tabs button{font:inherit;font-size:13px;font-weight:600;padding:10px 16px;border:1px solid var(--line);border-bottom:0;border-radius:5px 5px 0 0;background:var(--panel2);color:var(--muted);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--green);color:#000;border-color:var(--green)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
+.grid{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:20px;align-items:start;padding-bottom:36px}
+@media (max-width:880px){.grid{grid-template-columns:minmax(0,1fr)}}
+.form{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--green)}
+.fsec{padding:18px 20px;display:grid;gap:12px}
+.fsec+.fsec{border-top:1px solid var(--line);background:var(--panel2)}
+.frow{display:grid;grid-template-columns:108px minmax(0,1fr);gap:10px;align-items:center}
+.frow>.lab{font-size:13px;font-weight:500}
+.lab small,.opt{color:var(--muted);font-weight:400}
+.ctl{display:flex;gap:8px;min-width:0;align-items:center}
+.inp{display:flex;align-items:center;background:var(--ink);border:1px solid var(--line);border-radius:4px;flex:1;min-width:0}
+.inp:focus-within{border-color:var(--green)}
+.inp .ad{padding:0 9px;color:var(--muted);font-weight:600;font-size:13px}
+.inp .ad.l{border-right:1px solid var(--line)}
+input,select{font:inherit;color:var(--fg);background:var(--ink);border:0;padding:9px 10px;width:100%;min-width:0;outline:none}
+input[type=date]{color-scheme:dark}
+select{border:1px solid var(--line);border-radius:4px;flex:1;min-width:0;cursor:pointer}
+.seg{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;flex:1}
+.seg button{flex:1;font:inherit;font-size:12.5px;font-weight:600;background:var(--ink);color:var(--fg);border:0;border-left:1px solid var(--line);padding:8px 4px;cursor:pointer;min-width:0}
+.seg button:first-child{border-left:0}
+.seg button[aria-pressed="true"]{background:var(--green);color:#000}
+.seg.sm{flex:none}
+.seg.sm button{padding:8px 12px}
+.help{width:22px;height:22px;flex:none;border:1px solid var(--line);border-radius:3px;color:var(--muted);display:grid;place-items:center;font-size:12px;cursor:help}
+.stack{display:grid;gap:6px}
+.stack>.lab{font-size:13px;font-weight:500}
+.calcbar{padding:16px 20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.calcbar .err{color:var(--red);font-size:12.5px}
+.calc{font:inherit;font-weight:700;font-size:15px;background:var(--green);color:#000;border:0;border-radius:4px;padding:11px 26px;cursor:pointer}
+.calc:hover{background:var(--lime)}
+.reset{font:inherit;font-size:12.5px;background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer}
+.res{background:var(--panel);border:1px solid var(--line);padding:22px 24px}
+.res h2{font-family:var(--display);font-weight:400;color:var(--lime);font-size:clamp(20px,3vw,27px);margin:0 0 14px;padding-bottom:14px;border-bottom:1px solid var(--line);text-wrap:balance}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px}
+@media (max-width:520px){.stats{grid-template-columns:minmax(0,1fr)}}
+.stats .col{display:grid;gap:12px;align-content:start;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.st .k{font-size:12.5px;color:var(--muted)}
+.st .v{font-family:var(--display);font-size:clamp(22px,3.2vw,30px);line-height:1.15;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.v.g{color:var(--lime)} .v.y{color:var(--gold)} .v.w{color:var(--fg)} .v.b{color:#7fc4e8} .v.r{color:var(--red)}
+.v .arrow{color:var(--muted);font-family:var(--body);font-weight:400}
+.ctrls{display:flex;gap:22px;flex-wrap:wrap;margin:18px 0 12px;align-items:flex-end}
+.ctrls .lab{font-size:12px;color:var(--muted);margin-bottom:5px}
+.icons{display:flex;gap:4px;border:1px solid var(--line);border-radius:6px;padding:4px}
+.icons button{background:none;border:0;border-radius:4px;color:var(--muted);padding:5px 8px;cursor:pointer;display:grid;place-items:center}
+.icons button[aria-pressed="true"]{background:var(--green);color:#000}
+.icons svg{width:22px;height:22px}
+h3{font-size:15px;color:var(--lime);margin:4px 0 10px;font-weight:600}
+.tablewrap{overflow:auto;max-height:460px;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:12.5px}
+th,td{padding:8px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th{position:sticky;top:0;background:#2a2f24;color:var(--fg);font-size:11px;font-weight:700;text-align:right;z-index:1}
+td:first-child,th:first-child{text-align:center}
+th.hi1{background:var(--green);color:#000} th.hi2{background:var(--lime);color:#000}
+td.hi2{font-weight:700}
+tbody tr:nth-child(even){background:#12150f}
+tbody tr.last{background:#2a2f24;font-weight:700}
+tbody tr.last td.hi1{background:var(--green);color:#000}
+tbody tr.last td.hi2{background:var(--lime);color:#000}
+td.neg{color:var(--red)}
+canvas{width:100%;height:280px;display:block}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:8px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;margin-right:6px;vertical-align:-1px}
+.summary{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;font-size:14px}
+.summary dt{color:var(--muted)} .summary dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums}
+.tips{margin-top:16px;padding:14px 16px;background:var(--panel2);border-left:3px solid var(--green);font-size:13px}
+.tips ul{margin:6px 0 0;padding-left:18px}
+.note{font-size:12px;color:var(--muted);margin:16px 0 0;max-width:90ch}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:12px;background:#000}
+footer .wrap{padding-block:16px}
+</style>
+</head><body>
+<noscript><p style="padding:16px;color:#fff">This calculator needs JavaScript turned on.</p></noscript>
+<header><div class="wrap">
+<div class="mark" aria-hidden="true"><span>P</span></div>
+<div><div class="word">POVERTY <b>PROOF</b></div><div class="tagline">Wealth-building tools</div></div>
+</div></header>
+<main class="wrap">
+<h1>Compound Interest <em>Calculator</em></h1>
+<p class="lede">See how your savings or investments can grow when your earnings start earning too. Fill in the fields and press Calculate.</p>
+<div class="tabs" role="tablist">
+<button role="tab" data-tab="compound" aria-selected="true">Compound Interest</button>
+<button role="tab" data-tab="simple" aria-selected="false">Simple Interest</button>
+<button role="tab" data-tab="daily" aria-selected="false">Daily Compound</button>
+<button role="tab" data-tab="forex" aria-selected="false">Forex Compound</button>
+</div>
+<div class="grid">
+<form class="form" id="form" novalidate>
+<div class="fsec">
+<div class="frow"><span class="lab">Currency:</span>
+<div class="seg" id="cur" role="group" aria-label="Currency">
+<button type="button" data-v="$" aria-pressed="true">$</button><button type="button" data-v="€">€</button><button type="button" data-v="£">£</button><button type="button" data-v="₹">₹</button><button type="button" data-v="¥">¥</button>
+</div></div>
+</div>
+<div data-panel="compound">
+<div class="fsec">
+<div class="frow"><label class="lab" for="c_p">Initial investment:</label><div class="inp"><span class="ad l cs">$</span><input id="c_p" type="number" min="0" step="any" value="5000" inputmode="decimal"></div></div>
+<div class="frow"><label class="lab" for="c_r">Interest rate:</label>
+<div class="ctl"><div class="inp"><input id="c_r" type="number" step="any" value="5" inputmode="decimal"><span class="ad">%</span></div>
+<select id="c_rp" aria-label="Rate period"><option value="365">daily</option><option value="52">weekly</option><option value="12">monthly</option><option value="4">quarterly</option><option value="1" selected>annual</option></select></div></div>
+<div class="frow"><label class="lab" for="c_n">Compound frequency:</label>
+<div class="ctl"><select id="c_n">
+<option value="365">Daily (365/yr)</option><option value="360">Daily (360/yr)</option><option value="104">Semi-Weekly (104/yr)</option><option value="52">Weekly (52/yr)</option><option value="26">Bi-Weekly (26/yr)</option><option value="24">Semi-Monthly (24/yr)</option><option value="12" selected>Monthly (12/yr)</option><option value="6">Bi-Monthly (6/yr)</option><option value="4">Quarterly (4/yr)</option><option value="2">Half-Yearly (2/yr)</option><option value="1">Yearly (1/yr)</option><option value="custom">Custom…</option>
+</select><span class="help" title="How many times per year interest is added to your balance. More often = slightly faster growth.">?</span></div></div>
+<div class="frow" id="c_custrow" hidden><label class="lab" for="c_nc">Compounds per year:</label><div class="inp"><input id="c_nc" type="number" min="1" step="1" value="12"></div></div>
+<div class="frow"><span class="lab">Time:</span>
+<div class="ctl"><div class="inp"><input id="c_y" type="number" min="0" max="100" step="1" value="5" aria-label="Years"><span class="ad">yrs</span></div><div class="inp"><input id="c_m" type="number" min="0" max="11" step="1" value="0" aria-label="Months"><span class="ad">mos</span></div></div></div>
+</div>
+<div class="fsec">
+<div class="stack"><span class="lab">Regular contributions: <span class="opt">(optional)</span></span>
+<div class="seg" id="c_mode" role="group" aria-label="Regular contributions">
+<button type="button" data-v="none">None</button><button type="button" data-v="dep" aria-pressed="true">Deposits</button><button type="button" data-v="wd">Withdrawals</button><button type="button" data-v="both">Both</button>
+</div></div>
+<div id="c_depbox" class="stack" style="gap:12px">
+<div class="stack"><label class="lab" for="c_d">Deposit amount: <span class="opt">(optional)</span></label>
+<div class="ctl"><div class="inp"><span class="ad l cs">$</span><input id="c_d" type="number" min="0" step="any" placeholder="0" inputmode="decimal"></div>
+<select id="c_df" aria-label="Deposit frequency"><option value="52">weekly</option><option value="26">bi-weekly</option><option value="12" selected>monthly</option><option value="4">quarterly</option><option value="2">half-yearly</option><option value="1">yearly</option></select></div></div>
+<div class="stack"><span class="lab">Deposits made at what point in period?</span>
+<div class="seg sm" id="c_dt" role="group" aria-label="Deposit timing"><button type="button" data-v="start">Beginning</button><button type="button" data-v="end" aria-pressed="true">End</button></div></div>
+<div class="stack"><label class="lab" for="c_di">Annual deposit increase? <span class="opt">(optional)</span></label>
+<div class="ctl"><div class="seg sm" id="c_dit" role="group" aria-label="Increase type"><button type="button" data-v="pct" aria-pressed="true">%</button><button type="button" data-v="amt">$</button></div>
+<div class="inp"><input id="c_di" type="number" min="0" step="any" placeholder="0" inputmode="decimal"><span class="ad" id="c_diu">%</span></div></div></div>
+</div>
+<div id="c_wdbox" class="stack" style="gap:12px" hidden>
+<div class="stack"><label class="lab" for="c_w">Withdrawal amount:</label>
+<div class="ctl"><div class="inp"><span class="ad l" id="c_wu">$</span><input id="c_w" type="number" min="0" step="any" placeholder="0" inputmode="decimal"></div>
+<select id="c_wf" aria-label="Withdrawal type and frequency">
+<optgroup label="Money withdrawals"><option value="amt:12" selected>monthly $</option><option value="amt:4">quarterly $</option><option value="amt:2">half-yearly $</option><option value="amt:1">yearly $</option></optgroup>
+<optgroup label="Percentage of balance"><option value="bal:12">% each month</option><option value="bal:4">% each quarter</option><option value="bal:1">% each year</option></optgroup>
+<optgroup label="Earnings withdrawals"><option value="earn:12">% of earnings monthly</option><option value="earn:1">% of earnings yearly</option></optgroup>
+</select></div></div>
+<div class="stack" id="c_wirow"><label class="lab" for="c_wi">Annual withdrawal % increase? <span class="opt">(optional)</span></label>
+<div class="inp" style="max-width:160px"><input id="c_wi" type="number" min="0" step="any" placeholder="0"><span class="ad">%</span></div></div>
+</div>
+</div>
+</div>
+<div data-panel="simple" hidden>
+<div class="fsec">
+<div class="frow"><label class="lab" for="s_p">Principal:</label><div class="inp"><span class="ad l cs">$</span><input id="s_p" type="number" min="0" step="any" value="5000" inputmode="decimal"></div></div>
+<div class="frow"><label class="lab" for="s_r">Interest rate:</label>
+<div class="ctl"><div class="inp"><input id="s_r" type="number" step="any" value="5" inputmode="decimal"><span class="ad">%</span></div>
+<select id="s_rp" aria-label="Rate period"><option value="365">daily</option><option value="52">weekly</option><option value="12">monthly</option><option value="4">quarterly</option><option value="1" selected>annual</option></select></div></div>
+<div class="frow"><span class="lab">Time:</span>
+<div class="ctl"><div class="inp"><input id="s_y" type="number" min="0" max="100" step="1" value="5" aria-label="Years"><span class="ad">yrs</span></div><div class="inp"><input id="s_m" type="number" min="0" max="11" step="1" value="0" aria-label="Months"><span class="ad">mos</span></div></div></div>
+<p class="note" style="margin:0">Simple interest is earned on the principal only. It is never added back, so it does not compound.</p>
+</div>
+</div>
+<div data-panel="daily" hidden>
+<div class="fsec">
+<div class="frow"><label class="lab" for="d_p">Initial investment:</label><div class="inp"><span class="ad l cs">$</span><input id="d_p" type="number" min="0" step="any" value="1000" inputmode="decimal"></div></div>
+<div class="frow"><label class="lab" for="d_r">Interest rate:</label>
+<div class="ctl"><div class="inp"><input id="d_r" type="number" step="any" value="1" inputmode="decimal"><span class="ad">%</span></div>
+<select id="d_rt" aria-label="Rate type"><option value="daily" selected>daily</option><option value="365">annual (365 days)</option><option value="360">annual (360 days)</option></select></div></div>
+<div class="frow"><label class="lab" for="d_n">Number of days:</label><div class="inp"><input id="d_n" type="number" min="1" max="3650" step="1" value="30"><span class="ad">days</span></div></div>
+<div class="frow"><label class="lab" for="d_s">Start date:</label><div class="inp"><input id="d_s" type="date"></div></div>
+<div class="frow"><span class="lab">Include weekends?</span>
+<div class="seg sm" id="d_we" role="group" aria-label="Include weekends"><button type="button" data-v="yes" aria-pressed="true">Yes</button><button type="button" data-v="no">No</button></div></div>
+<div class="frow"><label class="lab" for="d_ri">Daily reinvest rate:</label>
+<div class="ctl"><div class="inp"><input id="d_ri" type="number" min="0" max="100" step="any" value="100"><span class="ad">%</span></div><span class="help" title="Share of each day's interest added back to the balance. The rest is taken as cash.">?</span></div></div>
+</div>
+<div class="fsec">
+<div class="stack"><label class="lab" for="d_d">Daily deposit: <span class="opt">(optional, made on earning days)</span></label>
+<div class="inp"><span class="ad l cs">$</span><input id="d_d" type="number" min="0" step="any" placeholder="0" inputmode="decimal"></div></div>
+</div>
+</div>
+<div data-panel="forex" hidden>
+<div class="fsec">
+<div class="frow"><label class="lab" for="f_p">Starting balance:</label><div class="inp"><span class="ad l cs">$</span><input id="f_p" type="number" min="0" step="any" value="1000" inputmode="decimal"></div></div>
+<div class="frow"><label class="lab" for="f_g">Gain per period:</label>
+<div class="ctl"><div class="inp"><input id="f_g" type="number" step="any" value="2" inputmode="decimal"><span class="ad">%</span></div><span class="help" title="Use a negative number for a losing period.">?</span></div></div>
+<div class="frow"><label class="lab" for="f_n">Number of periods:</label>
+<div class="ctl"><div class="inp"><input id="f_n" type="number" min="1" max="3650" step="1" value="12"></div>
+<select id="f_u" aria-label="Period type"><option value="trading days">trading days</option><option value="weeks">weeks</option><option value="months" selected>months</option><option value="years">years</option></select></div></div>
+</div>
+<div class="fsec">
+<div class="stack"><label class="lab" for="f_d">Deposit each period: <span class="opt">(optional)</span></label>
+<div class="inp"><span class="ad l cs">$</span><input id="f_d" type="number" min="0" step="any" placeholder="0" inputmode="decimal"></div></div>
+<div class="stack"><label class="lab" for="f_w">Withdraw % of each period's profit: <span class="opt">(optional)</span></label>
+<div class="inp" style="max-width:180px"><input id="f_w" type="number" min="0" max="100" step="any" placeholder="0"><span class="ad">%</span></div></div>
+</div>
+</div>
+<div class="calcbar"><button type="button" class="reset" id="reset">Reset</button><span class="err" id="err" role="alert"></span><button type="submit" class="calc">Calculate</button></div>
+</form>
+<section class="res" aria-live="polite">
+<h2 id="rtitle">Interest calculation</h2>
+<div class="stats" id="stats"></div>
+<div class="ctrls">
+<div id="bdwrap"><div class="lab">Breakdown choice</div><div class="seg sm" id="bd" role="group" aria-label="Breakdown"></div></div>
+<div><div class="lab">Table / Chart / Summary</div>
+<div class="icons" id="views" role="group" aria-label="View">
+<button type="button" data-v="table" aria-pressed="true" title="Table"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 9h18M3 14.5h18M9 9v11M15 9v11"/></svg></button>
+<button type="button" data-v="chart" aria-pressed="false" title="Chart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M9 20V6M14 20v-8M19 20V4M3 20h18"/></svg></button>
+<button type="button" data-v="summary" aria-pressed="false" title="Summary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></button>
+</div></div>
+</div>
+<div id="vtable"><h3 id="ttitle"></h3><div class="tablewrap"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div></div>
+<div id="vchart" hidden><h3 id="ctitle"></h3><canvas id="cv" role="img" aria-label="Balance growth chart"></canvas>
+<div class="legend"><span><i style="background:var(--green)"></i>Your money in</span><span><i style="background:var(--lime)"></i>Growth</span></div></div>
+<div id="vsum" hidden><h3>Summary</h3><dl class="summary" id="sum"></dl>
+<div class="tips"><b>Make the most of compounding</b><ul><li>Start early, even with small amounts.</li><li>Add regular contributions.</li><li>Leave the earnings in so they keep earning.</li></ul></div></div>
+<p class="note">For illustration only, not financial advice. Poverty Proof does not offer investments or promise returns. Results assume a fixed rate for the whole term.</p>
+</section>
+</div>
+</main>
+<footer><div class="wrap">© Poverty Proof · Projections are estimates, not promised returns.</div></footer>
+<script>
+const Calc={
+compound(o){
+const n=o.n, r=o.rate, g=Math.pow(1+r/n,n/12);      // monthly growth factor equivalent of n-per-year compounding
+let bal=o.P, td=o.P, tw=0, ti=0, interestSince=0;
+const rows=[{i:0,dep:o.P,wd:0,int:0,td,tw,ti,b:bal}];
+const useDep=o.mode==="dep"||o.mode==="both", useWd=o.mode==="wd"||o.mode==="both";
+for(let k=1;k<=o.months;k++){
+const yr=Math.floor((k-1)/12);
+let dep=0, wd=0;
+if(useDep&&o.dep>0){
+const amt=o.depIncType==="pct"? o.dep*Math.pow(1+o.depInc,yr) : o.dep+o.depInc*yr;
+if(o.depFreq>=12) dep=amt*o.depFreq/12;
+else { const ev=12/o.depFreq; if(o.depStart?((k-1)%ev===0):(k%ev===0)) dep=amt; }
+}
+if(o.depStart) bal+=dep;
+const it=bal*(g-1); bal+=it; interestSince+=it;
+if(!o.depStart) bal+=dep;
+if(useWd&&o.wd>0){
+const ev=12/o.wdFreq;
+if(k%ev===0){
+if(o.wdType==="amt") wd=o.wd*Math.pow(1+o.wdInc,yr);
+else if(o.wdType==="bal") wd=bal*o.wd;
+else wd=Math.max(0,interestSince)*o.wd;
+wd=Math.min(wd,Math.max(bal,0)); bal-=wd;
+}
+if(k%ev===0) interestSince=0;
+}
+td+=dep; tw+=wd; ti+=it;
+rows.push({i:k,dep,wd,int:it,td,tw,ti,b:bal});
+}
+const ear=Math.pow(1+r/n,n)-1;
+const contrib=(useDep&&o.dep>0)||(useWd&&o.wd>0);
+const ret=contrib? Math.pow(g,o.months)-1 : (o.P>0?(bal-o.P)/o.P:0);
+const dbl=ear>0? Math.log(2)/Math.log(1+ear) : null;
+return {rows,bal,td,tw,ti,ear,ret,contrib,dbl};
+},
+simple(o){
+const yearInt=o.P*o.rate, rows=[{i:0,int:0,ti:0,b:o.P}];
+let ti=0;
+for(let k=1;k<=o.months;k++){ const it=yearInt/12; ti+=it; rows.push({i:k,int:it,ti,b:o.P+ti}); }
+return {rows,ti,bal:o.P+ti};
+},
+daily(o){
+let bal=o.P, cash=0, ti=0, td=o.P, earnDays=0;
+const rows=[{i:0,date:new Date(o.start),int:0,dep:o.P,cash:0,ti:0,b:bal,earn:false}];
+for(let d=1;d<=o.days;d++){
+const dt=new Date(o.start); dt.setDate(dt.getDate()+d-1);
+const wkend=dt.getDay()===0||dt.getDay()===6;
+let it=0, rein=0, out=0, dep=0;
+if(o.weekends||!wkend){
+earnDays++;
+it=bal*o.dr; rein=it*o.reinvest; out=it-rein;
+bal+=rein; cash+=out; ti+=it;
+if(o.dep>0){dep=o.dep; bal+=dep; td+=dep;}
+}
+rows.push({i:d,date:dt,int:it,dep,cash:out,ti,b:bal,earn:o.weekends||!wkend});
+}
+return {rows,bal,cash,ti,td,earnDays};
+},
+forex(o){
+let bal=o.P, tp=0, td=o.P, tw=0;
+const rows=[{i:0,profit:0,dep:o.P,wd:0,tp:0,b:bal}];
+for(let k=1;k<=o.periods;k++){
+const profit=bal*o.gain;
+const wd=profit>0? profit*o.wdPct : 0;
+bal+=profit-wd; bal+=o.dep;
+if(bal<0) bal=0;
+tp+=profit; td+=o.dep; tw+=wd;
+rows.push({i:k,profit,dep:o.dep,wd,tp,b:bal});
+}
+return {rows,bal,tp,td,tw};
+}
+};
+const $=id=>document.getElementById(id);
+let CUR="$", TAB="compound", VIEW="table", BD=null, R=null;
+const num=(id,def=0)=>{const v=parseFloat($(id).value);return isFinite(v)?v:def};
+const money=v=>(v<0?"-":"")+CUR+Math.abs(v).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const pct=(v,d=2)=>(v*100).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})+"%";
+const plural=(n,w)=>n+" "+w+(n===1?"":"s");
+const dur=m=>{const y=Math.floor(m/12),mo=m%12;return [y?plural(y,"year"):"",mo?plural(mo,"month"):""].filter(Boolean).join(", ")||"0 months"};
+const segVal=id=>$(id).querySelector('[aria-pressed="true"]').dataset.v;
+function seg(id,cb){$(id).addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+$(id).querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));cb&&cb(b.dataset.v)})}
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
+TAB=b.dataset.tab;
+document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b?"true":"false"));
+document.querySelectorAll("[data-panel]").forEach(p=>p.hidden=p.dataset.panel!==TAB);
+BD=null; run();
+});
+seg("cur",v=>{CUR=v;document.querySelectorAll(".cs").forEach(s=>s.textContent=v);syncWdUnit();$("c_diu").textContent=segVal("c_dit")==="pct"?"%":v;if(R)run()});
+seg("c_mode",v=>{$("c_depbox").hidden=!(v==="dep"||v==="both");$("c_wdbox").hidden=!(v==="wd"||v==="both")});
+seg("c_dt"); seg("d_we");
+seg("c_dit",v=>$("c_diu").textContent=v==="pct"?"%":CUR);
+function syncWdUnit(){const t=$("c_wf").value.split(":")[0];$("c_wu").textContent=t==="amt"?CUR:"%";$("c_wirow").hidden=t!=="amt"}
+$("c_wf").onchange=syncWdUnit;
+$("c_n").onchange=()=>$("c_custrow").hidden=$("c_n").value!=="custom";
+seg("views",v=>{VIEW=v;showView()});
+$("form").addEventListener("submit",e=>{e.preventDefault();run()});
+$("reset").onclick=()=>{location.hash="";$("form").reset();setToday();
+["c_mode","c_dt","c_dit","d_we"].forEach(id=>{const bs=$(id).querySelectorAll("button");const def={c_mode:"dep",c_dt:"end",c_dit:"pct",d_we:"yes"}[id];bs.forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===def?"true":"false"))});
+$("c_depbox").hidden=false;$("c_wdbox").hidden=true;$("c_custrow").hidden=true;$("c_diu").textContent="%";syncWdUnit();run()};
+function setToday(){const d=new Date();$("d_s").value=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+window.addEventListener("resize",()=>{if(VIEW==="chart")draw()});
+function fail(msg){$("err").textContent=msg;return false}
+function run(){
+$("err").textContent="";
+const out=({compound:runCompound,simple:runSimple,daily:runDaily,forex:runForex})[TAB]();
+if(!out)return;
+R=out; renderStats(); renderBd(); showView();
+}
+function runCompound(){
+const P=num("c_p"), rate=num("c_r")/100*(+$("c_rp").value);
+let n=$("c_n").value==="custom"?Math.round(num("c_nc",12)):+$("c_n").value;
+const months=Math.round(num("c_y")*12+num("c_m"));
+if(P<0)return fail("Initial investment can't be negative.");
+if(n<1)return fail("Compounds per year must be at least 1.");
+if(months<1)return fail("Enter at least 1 month of time.");
+if(months>1200)return fail("Keep the term to 100 years or less.");
+if(rate/n<=-1)return fail("That rate would wipe out the balance. Use a smaller negative rate.");
+const [wdType,wdFreq]=$("c_wf").value.split(":");
+const o={P,rate,n,months,mode:segVal("c_mode"),dep:num("c_d"),depFreq:+$("c_df").value,depStart:segVal("c_dt")==="start",
+depIncType:segVal("c_dit"),depInc:segVal("c_dit")==="pct"?num("c_di")/100:num("c_di"),
+wdType,wdFreq:+wdFreq,wd:wdType==="amt"?num("c_w"):num("c_w")/100,wdInc:num("c_wi")/100};
+const c=Calc.compound(o);
+const yrs=months/12;
+return {
+title:"Interest calculation for "+dur(months),
+stats:[[["Future investment value",money(c.bal),"g"],["Total interest earned",money(c.ti),"y"],
+c.contrib?["Total deposits",money(c.td),"b"]:["Initial balance",money(P),"b"],
+...(c.tw>0?[["Total withdrawals",money(c.tw),"r"]]:[])],
+[["Yearly rate → Compounded rate",`${pct(rate,2).replace(".00","")} <span class="arrow">→</span> ${pct(c.ear)}`,"w"],
+[c.contrib?"Time-weighted return (TWR)":"All-time rate of return (RoR)",pct(c.ret),"w"],
+["Time needed to double investment",c.dbl?fmtYears(c.dbl):"Never at this rate","w"]]],
+bdOpts:[["monthly","Monthly"],["yearly","Yearly"]], bdDef:"yearly",
+table:bd=>{
+const showW=c.tw>0||o.mode==="wd"||o.mode==="both";
+const head=["Year","Deposits","Interest","Total deposits","Accrued interest","Balance"];
+if(showW){head.splice(2,0,"Withdrawals");head.splice(5,0,"Total withdrawals")}
+if(bd==="monthly")head[0]="Month";
+const rows=group(c.rows,bd==="yearly"?12:1,months).map(g=>{const cells=[g.label,dash(g.sum("dep")),dash(g.sum("int")),money(g.last.td),dash(g.last.ti),money(g.last.b)];
+if(showW){cells.splice(2,0,dash(g.sum("wd")));cells.splice(5,0,dash(g.last.tw))}return cells});
+return {title:(bd==="yearly"?"Yearly":"Monthly")+" breakdown",head,rows,hi:[head.length-2,head.length-1]};
+},
+chart:()=>yearPoints(c.rows,months,r=>r.td-r.tw,r=>r.b),
+summary:[["Initial deposit",money(P)],["Interest rate",pct(num("c_r")/100,2).replace(".00","")+" "+$("c_rp").selectedOptions[0].text],["Effective annual rate (APY)",pct(c.ear)],
+["Compounding",$("c_n").value==="custom"?n+" times per year":$("c_n").selectedOptions[0].text],["Time",dur(months)],
+["Total deposits",money(c.td)],...(c.tw>0?[["Total withdrawals",money(c.tw)]]:[]),["Total interest",money(c.ti)],["Final balance",money(c.bal)]]
+};
+}
+function runSimple(){
+const P=num("s_p"), rate=num("s_r")/100*(+$("s_rp").value), months=Math.round(num("s_y")*12+num("s_m"));
+if(P<0)return fail("Principal can't be negative.");
+if(months<1)return fail("Enter at least 1 month of time.");
+if(months>1200)return fail("Keep the term to 100 years or less.");
+const s=Calc.simple({P,rate,months});
+return {
+title:"Simple interest for "+dur(months),
+stats:[[["Final balance",money(s.bal),"g"],["Total interest earned",money(s.ti),"y"],["Principal",money(P),"b"]],
+[["Annual rate",pct(rate),"w"],["Interest per year",money(P*rate),"w"],["Rate of return",pct(P>0?s.ti/P:0),"w"]]],
+bdOpts:[["monthly","Monthly"],["yearly","Yearly"]], bdDef:"yearly",
+table:bd=>{const head=[bd==="yearly"?"Year":"Month","Interest","Accrued interest","Balance"];
+return {title:(bd==="yearly"?"Yearly":"Monthly")+" breakdown",head,hi:[2,3],
+rows:group(s.rows,bd==="yearly"?12:1,months).map(g=>[g.label,dash(g.sum("int")),dash(g.last.ti),money(g.last.b)])}},
+chart:()=>yearPoints(s.rows,months,()=>P,r=>r.b),
+summary:[["Principal",money(P)],["Annual rate",pct(rate)],["Time",dur(months)],["Total interest",money(s.ti)],["Final balance",money(s.bal)]]
+};
+}
+function runDaily(){
+const P=num("d_p"), rv=num("d_r")/100, rt=$("d_rt").value, days=Math.round(num("d_n"));
+const dr=rt==="daily"?rv:rv/(+rt);
+if(P<0)return fail("Initial investment can't be negative.");
+if(days<1||days>3650)return fail("Number of days must be between 1 and 3,650.");
+if(!$("d_s").value)return fail("Pick a start date.");
+if(dr<=-1)return fail("That rate would wipe out the balance.");
+const ri=Math.min(100,Math.max(0,num("d_ri",100)))/100;
+const [Y,M,D]=$("d_s").value.split("-").map(Number);
+const d=Calc.daily({P,dr,days,start:new Date(Y,M-1,D),weekends:segVal("d_we")==="yes",reinvest:ri,dep:num("d_d")});
+const end=d.rows[d.rows.length-1].date;
+const fmtD=x=>x.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+return {
+title:"Daily compounding for "+plural(days,"day"),
+stats:[[["Final balance",money(d.bal),"g"],["Total interest earned",money(d.ti),"y"],["Total deposits",money(d.td),"b"]],
+[["Daily rate",pct(dr,3),"w"],["Cash taken out",money(d.cash),"w"],["Earning days",d.earnDays+" of "+days,"w"]]],
+bdOpts:[["daily","Daily"],["monthly","Monthly"]], bdDef:"daily",
+table:bd=>{const head=[bd==="daily"?"Day":"Month","Date","Interest","Cash out","Accrued interest","Balance"];
+let rows;
+if(bd==="daily") rows=d.rows.map(r=>[r.i,r.i?fmtD(r.date):"Start",r.i?(r.earn?money(r.int):"Weekend"):"–",dash(r.cash),dash(r.ti),money(r.b)]);
+else{ rows=[[0,"Start","–","–","–",money(P)]]; let cur=null,acc=null,idx=0;
+for(const r of d.rows.slice(1)){const key=r.date.getFullYear()*12+r.date.getMonth();
+if(key!==cur){if(acc)rows.push(acc.fin());cur=key;idx++;const lbl=r.date.toLocaleDateString("en-US",{month:"short",year:"numeric"});
+acc={i:0,c:0,last:r,fin(){return [idx,lbl,money(this.i),dash(this.c),money(this.last.ti),money(this.last.b)]}};}
+acc.i+=r.int;acc.c+=r.cash;acc.last=r;}
+if(acc)rows.push(acc.fin());}
+return {title:(bd==="daily"?"Daily":"Monthly")+" breakdown",head,rows,hi:[4,5]}},
+chart:()=>{const step=Math.max(1,Math.ceil(days/24)),pts=[];for(let i=0;i<=days;i+=step)pts.push(i);if(pts[pts.length-1]!==days)pts.push(days);
+let dep=P;return pts.map(i=>{const r=d.rows[i];let td=P;for(let j=1;j<=i;j++)td+=d.rows[j].dep;return {label:"D"+i,base:td,total:r.b}})},
+summary:[["Start date",fmtD(new Date(Y,M-1,D))],["End date",fmtD(end)],["Daily rate",pct(dr,4)],["Weekends",segVal("d_we")==="yes"?"Included":"Excluded"],
+["Reinvest rate",pct(ri,0)],["Total deposits",money(d.td)],["Total interest",money(d.ti)],["Cash taken out",money(d.cash)],["Final balance",money(d.bal)]]
+};
+}
+function runForex(){
+const P=num("f_p"), gain=num("f_g")/100, n=Math.round(num("f_n")), u=$("f_u").value;
+if(P<0)return fail("Starting balance can't be negative.");
+if(n<1||n>3650)return fail("Number of periods must be between 1 and 3,650.");
+if(gain<=-1)return fail("A loss of 100% or more per period wipes out the account.");
+const f=Calc.forex({P,gain,periods:n,dep:num("f_d"),wdPct:Math.min(100,Math.max(0,num("f_w")))/100});
+const unit=u.replace(/s$/,"").replace("trading day","day");
+return {
+title:"Forex compounding over "+n+" "+u,
+stats:[[["Ending balance",money(f.bal),f.bal>=f.td?"g":"r"],["Total profit",money(f.tp),f.tp>=0?"y":"r"],["Total deposits",money(f.td),"b"],...(f.tw>0?[["Profit withdrawn",money(f.tw),"w"]]:[])],
+[["Gain per period",pct(gain),"w"],["Total gain on deposits",pct(f.td>0?(f.bal+f.tw-f.td)/f.td:0),"w"],
+["Periods to double",gain>0?(Math.log(2)/Math.log(1+gain)).toFixed(1)+" "+u:"Never at this rate","w"]]],
+bdOpts:[["period","Per "+unit],["10","Every 10"]], bdDef:"period",
+table:bd=>{const step=bd==="period"?1:10;const head=[unit.charAt(0).toUpperCase()+unit.slice(1),"Profit","Deposits","Withdrawn","Total profit","Balance"];
+return {title:"Breakdown",head,hi:[4,5],rows:group(f.rows,step,n).map(g=>[g.label,signMoney(g.sum("profit")),dash(g.sum("dep")),dash(g.sum("wd")),signMoney(g.last.tp),money(g.last.b)])}},
+chart:()=>{const step=Math.max(1,Math.ceil(n/24)),pts=[];for(let i=0;i<=n;i+=step)pts.push(i);if(pts[pts.length-1]!==n)pts.push(n);
+return pts.map(i=>({label:String(i),base:P+f.rows[i].dep*0+(i?f.rows.slice(1,i+1).reduce((a,r)=>a+r.dep,0):0),total:f.rows[i].b}))},
+summary:[["Starting balance",money(P)],["Gain per period",pct(gain)],["Periods",n+" "+u],["Total deposits",money(f.td)],["Total profit",money(f.tp)],["Profit withdrawn",money(f.tw)],["Ending balance",money(f.bal)]]
+};
+}
+function fmtYears(t){let y=Math.floor(t),m=Math.round((t-y)*12);if(m===12){y++;m=0}return [y?plural(y,"year"):"",m?plural(m,"month"):""].filter(Boolean).join(", ")}
+const dash=v=>v?money(v):"–";
+const signMoney=v=>v?money(v):"–";
+function group(rows,step,total){
+const out=[{label:0,last:rows[0],sum:k=>(rows[0][k]||0)}];
+for(let s=1;s<=total;s+=step){const e=Math.min(s+step-1,total),sl=rows.slice(s,e+1);
+const label=step===12?(e%12?(e/12).toFixed(2):e/12):e;
+out.push({label,last:rows[e],sum:k=>sl.reduce((a,r)=>a+(r[k]||0),0)});}
+return out;
+}
+function yearPoints(rows,months,base,total){
+const step=months<=24?1:months<=120?12:Math.ceil(months/12/20)*12, pts=[];
+for(let k=0;k<=months;k+=step)pts.push(k); if(pts[pts.length-1]!==months)pts.push(months);
+return pts.map(k=>({label:step===1?"M"+k:(k%12?(k/12).toFixed(1):k/12)+"y",base:base(rows[k]),total:total(rows[k])}));
+}
+function renderStats(){
+$("rtitle").textContent=R.title;
+$("stats").innerHTML=R.stats.map(col=>`<div class="col">${col.map(([k,v,c])=>`<div class="st"><div class="k">${k}</div><div class="v ${c}">${v}</div></div>`).join("")}</div>`).join("");
+}
+function renderBd(){
+if(!BD||!R.bdOpts.some(o=>o[0]===BD))BD=R.bdDef;
+$("bd").innerHTML=R.bdOpts.map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${v===BD}">${l}</button>`).join("");
+}
+$("bd").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;BD=b.dataset.v;renderBd();showView()});
+function showView(){
+if(!R)return;
+$("views").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===VIEW?"true":"false"));
+$("vtable").hidden=VIEW!=="table";$("vchart").hidden=VIEW!=="chart";$("vsum").hidden=VIEW!=="summary";
+$("bdwrap").style.visibility=VIEW==="table"?"visible":"hidden";
+if(VIEW==="table")renderTable(); else if(VIEW==="chart")draw(); else renderSummary();
+}
+function renderTable(){
+const t=R.table(BD); $("ttitle").textContent=t.title;
+const cls=i=>i===t.hi[0]?"hi1":i===t.hi[1]?"hi2":"";
+$("thead").innerHTML="<tr>"+t.head.map((h,i)=>`<th class="${cls(i)}">${h}</th>`).join("")+"</tr>";
+$("tbody").innerHTML=t.rows.map((r,ri)=>`<tr class="${ri===t.rows.length-1?"last":""}">${r.map((c,i)=>`<td class="${cls(i)}${String(c).startsWith("-")?" neg":""}">${c}</td>`).join("")}</tr>`).join("");
+}
+function renderSummary(){$("sum").innerHTML=R.summary.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join("")}
+function draw(){
+const pts=R.chart(); $("ctitle").textContent="Balance over time";
+const c=$("cv"),dpr=window.devicePixelRatio||1,W=c.clientWidth,H=c.clientHeight; if(!W)return;
+c.width=W*dpr;c.height=H*dpr;const x=c.getContext("2d");x.scale(dpr,dpr);x.clearRect(0,0,W,H);
+const cs=getComputedStyle(document.documentElement),G=cs.getPropertyValue("--green").trim(),L=cs.getPropertyValue("--lime").trim(),M=cs.getPropertyValue("--muted").trim(),LN=cs.getPropertyValue("--line").trim();
+const left=70,right=10,top=10,bot=28,pw=W-left-right,ph=H-top-bot;
+const max=Math.max(1,...pts.map(p=>Math.max(p.total,p.base)));const st=nice(max/4),topV=Math.ceil(max/st)*st;
+x.font="11px Archivo, system-ui, sans-serif";x.lineWidth=1;
+for(let v=0;v<=topV+1e-9;v+=st){const y=top+ph-v/topV*ph;x.strokeStyle=LN;x.beginPath();x.moveTo(left,y);x.lineTo(W-right,y);x.stroke();x.fillStyle=M;x.textAlign="right";x.textBaseline="middle";x.fillText(short(v),left-8,y)}
+const n=pts.length,slot=pw/n,bw=Math.max(3,Math.min(36,slot*.66)),every=Math.ceil(n/(W<500?6:12));
+pts.forEach((p,i)=>{const cx=left+slot*i+slot/2,hb=Math.max(0,Math.min(p.base,p.total))/topV*ph,ht=Math.max(0,p.total)/topV*ph;
+x.fillStyle=G;x.fillRect(cx-bw/2,top+ph-hb,bw,hb);
+if(ht>hb){x.fillStyle=L;x.fillRect(cx-bw/2,top+ph-ht,bw,ht-hb)}
+if(i%every===0||i===n-1){x.fillStyle=M;x.textAlign="center";x.textBaseline="top";x.fillText(p.label,cx,top+ph+8)}});
+}
+function nice(v){const p=Math.pow(10,Math.floor(Math.log10(v||1))),f=v/p;return (f<=1?1:f<=2?2:f<=5?5:10)*p}
+function short(v){const a=Math.abs(v);return CUR+(a>=1e9?(v/1e9).toFixed(1)+"B":a>=1e6?(v/1e6).toFixed(a%1e6?1:0)+"M":a>=1e3?(v/1e3).toFixed(a%1e3?1:0)+"k":v)}
+setToday(); syncWdUnit(); run();
+</script>
+</body></html>
